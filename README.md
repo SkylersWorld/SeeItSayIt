@@ -1,7 +1,7 @@
-# Community Emergency Alert System (CEAS)
+# Community Emergency Alert System (SeeItSayIt)
 
 ## Overview
-**CEAS** is a real-time, location-based emergency communication 
+a real-time, location-based emergency communication 
 platform designed to bridge the gap between citizens and local authorities. 
 It addresses the critical problem of slow local emergency communication by allowing users to 
 report incidents such as fires, floods, or violence instantly.
