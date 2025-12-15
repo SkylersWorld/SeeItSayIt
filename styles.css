@@ -1,0 +1,83 @@
+/* Minimalist High-Contrast Design */
+body {
+    background-color: #ffffff; /* Basic white background */
+    color: #000000; /* Black text */
+    font-family: 'Courier New', Courier, monospace; /* Professional, serious font */
+    margin: 0;
+    padding: 20px;
+}
+
+h1, h2, h3 {
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+/* Important things underlined in red */
+.urgent-text {
+    text-decoration: underline;
+    text-decoration-color: red;
+    text-decoration-thickness: 3px;
+    font-weight: bold;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    gap: 20px;
+}
+
+/* Authentication Section */
+#auth-section {
+    border: 2px solid black;
+    padding: 20px;
+    margin-bottom: 20px;
+}
+
+/* Map Styling */
+#map {
+    height: 500px;
+    border: 2px solid black;
+    background-color: #f0f0f0;
+}
+
+/* Live Feed Styling */
+#feed-panel {
+    border: 2px solid black;
+    padding: 20px;
+    height: 500px;
+    overflow-y: scroll;
+}
+
+.alert-card {
+    border-bottom: 1px solid black;
+    padding: 10px 0;
+}
+
+.alert-type {
+    font-weight: bold;
+    color: red; /* Red text for emergency type */
+}
+
+/* Form Styling */
+input, select, button {
+    display: block;
+    width: 100%;
+    margin-bottom: 10px;
+    padding: 10px;
+    border: 1px solid black;
+    background: white;
+    color: black;
+    font-family: inherit;
+}
+
+button {
+    cursor: pointer;
+    font-weight: bold;
+}
+
+button:hover {
+    background-color: black;
+    color: white;
+}
