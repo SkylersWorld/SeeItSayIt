@@ -19,7 +19,16 @@ h1, h2, h3 {
     text-decoration-thickness: 3px;
     font-weight: bold;
 }
-
+/* Map Styling */
+#map {
+    height: 400px; /* Crucial: Defines the visible area */
+    width: 100%;
+    border: var(--border-style);
+    margin-bottom: 20px;
+    background-color: #e5e5e5;
+    position: relative;
+    z-index: 1;
+}
 .container {
     max-width: 1200px;
     margin: 0 auto;
