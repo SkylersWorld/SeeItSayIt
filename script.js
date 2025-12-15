@@ -131,4 +131,146 @@ function addAlertToFeed(alert) {
         ${alert.description}
     `;
     feed.prepend(item);
+    // Global Variables for Connectivity and State
+const BACKEND_URL = 'http://localhost:8080'; // Spring Boot default port
+let stompClient = null;
+let isLoggedIn = false;
+let userEmail = null;
+let userPhone = null;
+
+// --- 1. WebSocket Connectivity ---
+function connect() {
+    const socket = new SockJS(BACKEND_URL + '/ws');
+    stompClient = Stomp.over(socket);
+    
+    stompClient.connect({}, (frame) => {
+        console.log('Connected: ' + frame);
+        document.getElementById('system-status').innerText = 'System Operational (Live)';
+        
+        // Subscribe to the public alert topic
+        stompClient.subscribe('/topic/alerts', (alertMessage) => {
+            const alert = JSON.parse(alertMessage.body);
+            // Function to update the UI
+            addAlertToFeed(alert);
+            addMarkerToMap(alert);
+        });
+
+    }, (error) => {
+        console.error('Connection error: ' + error);
+        document.getElementById('system-status').innerText = 'System Offline (Connection Error)';
+    });
+}
+
+// Initialize connection when the script loads
+connect();
+
+
+// --- 2. AUTHENTICATION & STATE MANAGEMENT ---
+
+// Updated handleLogin to simulate a real login (assumes previous signup)
+function handleLogin() {
+    const email = document.getElementById('email').value;
+    const password = document.getElementById('password').value;
+
+    // NOTE: Real login uses JWT/Session. We mock state here for simplicity.
+    if (email.includes('@') && password.length > 0) {
+        isLoggedIn = true;
+        userEmail = email;
+        // In a real app, you fetch user data (including phone) here.
+        userPhone = "+1234567890"; // Mock phone number after login
+
+        // UI Updates
+        document.getElementById('login-form').style.display = 'none';
+        document.getElementById('user-info').style.display = 'block';
+        document.getElementById('username-display').innerText = userEmail;
+        
+        document.getElementById('report-panel').style.opacity = '1';
+        document.getElementById('type').disabled = false;
+        document.getElementById('desc').disabled = false;
+        document.getElementById('anon').disabled = false;
+        document.getElementById('submit-btn').disabled = false;
+
+        alert(`Welcome, ${email}. Reporting is now enabled.`);
+    } else {
+        alert("Login Failed: Invalid credentials or account not verified.");
+    }
+}
+
+// Updated handleSignup to use a real HTTP fetch (assuming AuthController is running)
+function handleSignup() {
+    const email = document.getElementById('signup-email').value;
+    const password = document.getElementById('signup-password').value;
+    const phone = document.getElementById('signup-phone').value;
+
+    if (!email || !password || !phone) {
+        alert("Registration requires all fields.");
+        return;
+    }
+
+    const userData = { email, password, phoneNumber: phone };
+    
+    fetch(BACKEND_URL + '/api/auth/signup', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(userData)
+    })
+    .then(response => {
+        if (response.ok) {
+            alert("Registration successful! Check console for simulated verification link.");
+            showLogin();
+            document.getElementById('email').value = email;
+        } else {
+            return response.json().then(data => alert(`Registration Error: ${data.body}`));
+        }
+    })
+    .catch(error => {
+        console.error('Network Error:', error);
+        alert('Could not reach backend server for signup.');
+    });
+}
+
+// --- 3. REPORTING LOGIC (Using WebSocket) ---
+function submitAlert() {
+    if (!isLoggedIn || !stompClient || !stompClient.connected) {
+        alert("System not connected or user not logged in. Cannot transmit alert.");
+        return;
+    }
+
+    const type = document.getElementById('type').value;
+    const desc = document.getElementById('desc').value;
+    const isAnon = document.getElementById('anon').checked;
+    
+    // Ensure reporting fields are retrieved
+    const postalCode = document.getElementById('incident-postal-code').value;
+
+    if(!type || !desc || !postalCode) { 
+        alert("Please fill in the incident type, description, and postal code.");
+        return;
+    }
+    
+    // Reporter details
+    const reporter = isAnon ? "Anonymous" : userEmail;
+
+    // Generate Mock Location (real GPS would be used in a mobile app)
+    const lat = 40.7128 + (Math.random() - 0.5) * 0.02;
+    const lng = -74.0060 + (Math.random() - 0.5) * 0.02;
+
+    const alertData = {
+        type: type,
+        description: desc,
+        reporterName: reporter,
+        phoneNumber: userPhone, // Phone is tied to the logged-in user
+        postalCode: postalCode,
+        latitude: lat,
+        longitude: lng
+    };
+    
+    // *** KEY FIX: Send the alert data via WebSocket ***
+    stompClient.send("/app/report", {}, JSON.stringify(alertData));
+
+    // Clear form
+    document.getElementById('desc').value = "";
+    document.getElementById('incident-postal-code').value = "";
+    alert("ALERT TRANSMITTED! Authorities are being notified via SMS.");
+}
 }
