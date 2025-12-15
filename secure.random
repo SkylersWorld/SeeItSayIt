@@ -1,0 +1,44 @@
+package com.ceas.util;
+
+import java.security.SecureRandom;
+import java.util.concurrent.ThreadLocalRandom;
+
+public class SecurityCodeGenerator {
+
+    // Define the length of the code
+    private static final int CODE_LENGTH = 6;
+    private static final int MIN_VALUE = 100000; // Smallest 6-digit number
+    private static final int MAX_VALUE = 999999; // Largest 6-digit number
+
+    /**
+     * Generates a cryptographically secure 6-digit numerical code for verification.
+     * @return A String representation of the 6-digit code.
+     */
+    public static String generateVerificationCode() {
+        // Use ThreadLocalRandom for general numerical generation, which is efficient
+        // and suitable for non-sensitive random numbers, or SecureRandom for maximum assurance.
+        // For a PIN code, ThreadLocalRandom is often sufficient.
+        
+        int code = ThreadLocalRandom.current().nextInt(MIN_VALUE, MAX_VALUE + 1);
+        
+        // Ensure leading zeros are not lost if you were using a different method, 
+        // but this integer method guarantees a 6-digit number.
+        return String.valueOf(code);
+    }
+
+    /**
+     * Optional: Generate an alphanumeric token for cases requiring stronger entropy.
+     * @param length The desired length of the token.
+     * @return A strong, random alphanumeric string.
+     */
+    public static String generateSecureToken(int length) {
+        final String CHARACTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+        SecureRandom random = new SecureRandom();
+        StringBuilder token = new StringBuilder(length);
+
+        for (int i = 0; i < length; i++) {
+            token.append(CHARACTERS.charAt(random.nextInt(CHARACTERS.length())));
+        }
+        return token.toString();
+    }
+}
